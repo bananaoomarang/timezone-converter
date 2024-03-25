@@ -16,8 +16,6 @@
       .-timeZone))
 
 (defonce selected-time (r/atom (format now-date "yyyy-MM-dd'T'HH:mm")))
-(defonce valid-time? (r/atom true))
-
 (defonce selected-from-timezone (r/atom user-timezone))
 (defonce selected-to-timezone (r/atom "America/Los_Angeles"))
 
@@ -29,7 +27,7 @@
   (let [utc-date (zonedTimeToUtc (js/Date. datetime) from-zone)
         zoned-date (utcToZonedTime utc-date to-zone)]
     (try
-      (format zoned-date "Mo 'of' LLLL yyyy 'at' h:mm b" (clj->js {:timeZone to-zone}))
+      (format zoned-date "do 'of' LLLL yyyy 'at' h:mm b" (clj->js {:timeZone to-zone}))
       (catch :default _
         nil))))
 

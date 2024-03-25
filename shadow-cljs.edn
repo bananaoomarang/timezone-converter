@@ -7,8 +7,14 @@
  :dependencies
  [[reagent "1.2.0"]]
 
- :dev-http {8080 "public"}
+ :dev-http {8080 "public"
+            8021 "out/test"}
  :builds
- {:frontend
+ {:test
+  {:target :browser-test
+   :test-dir "out/test"
+   :ns-regexp "-test$"
+   :autorun true}
+  :frontend
   {:target :browser
    :modules {:main {:init-fn tzconverter.frontend.app/init}}}}}
