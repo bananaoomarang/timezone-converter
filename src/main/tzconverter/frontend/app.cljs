@@ -9,20 +9,29 @@
 (def now-date (.now js/Date))
 
 (def timezones (.supportedValuesOf js/Intl "timeZone"))
-;; (def timezones ["America/New_York" "America/Los_Angeles"])
-(def user-timezone (-> js/Intl
-                       .DateTimeFormat
-                       .resolvedOptions
-                       .-timeZone))
+(def user-timezone
+  (-> js/Intl
+      .DateTimeFormat
+      .resolvedOptions
+      .-timeZone))
 
 (defonce selected-time (r/atom (format now-date "yyyy-MM-dd'T'HH:mm")))
+(defonce valid-time? (r/atom true))
+
 (defonce selected-from-timezone (r/atom user-timezone))
 (defonce selected-to-timezone (r/atom "America/Los_Angeles"))
 
+;;
+;; Returns string for valid inputs
+;; Or nil for invalid ones
+;;
 (defn translate-timezone [datetime from-zone to-zone]
   (let [utc-date (zonedTimeToUtc (js/Date. datetime) from-zone)
         zoned-date (utcToZonedTime utc-date to-zone)]
-    (format zoned-date "Mo 'of' LLLL yyyy 'at' h:mm b" (clj->js {:timeZone to-zone}))))
+    (try
+      (format zoned-date "Mo 'of' LLLL yyyy 'at' h:mm b" (clj->js {:timeZone to-zone}))
+      (catch :default _
+        nil))))
 
 (defn select-timezone [label value]
   [:label label
@@ -39,13 +48,16 @@
             :on-change #(reset! value (-> % .-target .-value))}]])
 
 (defn result []
-  [:div.result
-   "Result time is: "
-   [:b
-    (translate-timezone
-     @selected-time
-     @selected-from-timezone
-     @selected-to-timezone)]])
+  (let [result-time (translate-timezone
+                     @selected-time
+                     @selected-from-timezone
+                     @selected-to-timezone)]
+    [:div.result
+     "Result time is: "
+
+     (if result-time
+       [:b result-time]
+       [:b.error "Invalid time"])]))
 
 (defn app []
   [:div

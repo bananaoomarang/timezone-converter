@@ -2,6 +2,7 @@
   --white: #fff;
   --black: #1e1d1a;
   --neutral-700: #4f4d4a;
+  --red: #ff3b30;
 }
 
 html,
@@ -32,4 +33,8 @@ label {
 
 .result {
   margin-top: 1rem;
+}
+
+.error {
+  color: red;
 }
