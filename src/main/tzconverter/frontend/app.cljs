@@ -15,8 +15,7 @@
                        .resolvedOptions
                        .-timeZone))
 
-(defonce selected-date (r/atom (format now-date "yyyy-MM-dd")))
-(defonce selected-time (r/atom (format now-date "HH:mm")))
+(defonce selected-time (r/atom (format now-date "yyyy-MM-dd'T'HH:mm")))
 (defonce selected-from-timezone (r/atom user-timezone))
 (defonce selected-to-timezone (r/atom "America/Los_Angeles"))
 
@@ -33,26 +32,25 @@
       ^{:key timezone}
       [:option {:value timezone} timezone])]])
 
-(defn select-time [label date-value time-value]
+(defn select-time [label value]
   [:label label
-   [:input {:type "date"
-            :value @date-value
-            :on-change #(reset! date-value (-> % .-target .-value))}]
-   [:input {:type "time"
-            :value @time-value
-            :on-change #(reset! time-value (-> % .-target .-value))}]])
+   [:input {:type "datetime-local"
+            :value @value
+            :on-change #(reset! value (-> % .-target .-value))}]])
 
 (defn result []
-  [:h3 "Result time is: "
-   (translate-timezone
-    (str @selected-date " " @selected-time)
-    @selected-from-timezone
-    @selected-to-timezone)])
+  [:div.result
+   "Result time is: "
+   [:b
+    (translate-timezone
+     @selected-time
+     @selected-from-timezone
+     @selected-to-timezone)]])
 
 (defn app []
   [:div
-   [:div
-    [select-time "Input Time" selected-date selected-time]
+   [:div.inputs
+    [select-time "Input Time" selected-time]
     [select-timezone "Input Timezone" selected-from-timezone]
     [select-timezone "Output Timezone" selected-to-timezone]]
    [result]])
